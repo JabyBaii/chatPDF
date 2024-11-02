@@ -1,5 +1,6 @@
 from openai import OpenAI
 from dotenv import load_dotenv, find_dotenv
+import streamlit as st
 
 _ = load_dotenv(find_dotenv())
 
@@ -72,6 +73,8 @@ def extract_text_from_pdf(filename, page_numbers=None, min_line_length=1):
                 full_text += element.get_text() + '\n'
     # 按空行分隔，将文本重新组织成段落
     lines = full_text.split('\n')
+    # 调试
+    st.write(lines)
     for text in lines:
         if len(text) >= min_line_length:
             buffer += (' '+text) if not text.endswith('-') else text.strip('-')

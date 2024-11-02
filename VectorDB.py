@@ -6,7 +6,7 @@ class MyVectorDBConnector:
         # chroma_client = chromadb.Client(Settings(
         #     allow_reset=True,
         # ))
-        # 不需要每次都reset
+        # # 不需要每次都reset
         # chroma_client.reset()
 
         chroma_client = chromadb.HttpClient(host='localhost', port=8000)
