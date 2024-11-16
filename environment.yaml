@@ -1,0 +1,15 @@
+name: chatPDF
+channels:
+  - pytorch
+  - defaults
+dependencies:
+  - python=3.10.11
+  - pip=24.1
+  - pip:
+    - llama-index==0.11.23
+    - PyMuPDF==1.24.13
+    - llama-index-readers-feishu-docs
+    - llama-index-vector-stores-qdrant==0.3.3
+    - python-dotenv
+    - llama-index-embeddings-huggingface
+    - sentence-transformers==3.3.0
