@@ -234,21 +234,62 @@ def rerank(top_n):
 
     return postprocessor
 
+def one_chat(index, query):
+    print(f"\nuser: \n{query}")
+    # 使用query engine查询
+    query_engine = index.as_query_engine(streaming=True)
+    print("bot: ")
+    streaming_response = query_engine.query(query)
+    streaming_response.print_response_stream()
+
+def multi_chat(index):
+    # 使用chat engine
+    chat_engine = index.as_chat_engine(
+        chat_mode="context",
+        system_prompt=(
+            "你是一个文档助手，可以回答关于文档的问题"
+            " 如果问题不在文档范围内，请回答：对不起，我无法回答这个问题"
+        ),
+        # 配置检索参数
+        similarity_top_k=3,  # 检索top k个相似结果
+        verbose=True,        # 显示详细信息
+    )
+    
+    # 获取retriever用于显示检索结果
+    retriever = index.as_retriever(similarity_top_k=3)
+
+    while True:
+        query = input("\nuser (输入'exit'退出): \n")
+        if query == "exit":
+            print("退出对话")
+            break
+        
+        # 显示检索结果
+        print("\n检索相关文档片段：")
+        results = retriever.retrieve(query)
+        for i, node in enumerate(results):
+            print(f"\n相关片段 {i + 1}:")
+            print(f"相似度得分: {node.score}")
+            print(f"文本内容: {node.text[:200]}...")  # 只显示前200个字符
+
+        print("bot: ")
+        streaming_response = chat_engine.stream_chat(query)
+        for token in streaming_response.response_gen:
+            print(token, end="")
+        print("\n")
+
 def main():
     file_path = "./data"
     # 文件加载
     documents = file_load(file_path)
     print_documents(file_path)
-    # 节点解析(切分文档)
-    chunk_size = 100
-    chunk_overlap = 50
-    nodes = node_parser(documents, chunk_size, chunk_overlap)
-    print_nodes(documents)
+
+    chunk_size = 300
+    chunk_overlap = 100
+
     # 构建存储空间
     storage_context, vector_store = qdrant_store()
     
-    chunk_size = 300
-    chunk_overlap = 100
     # # 节点解析(切分文档)
     # nodes = node_parser(documents, chunk_size, chunk_overlap)
     # print_nodes(documents)
@@ -258,25 +299,31 @@ def main():
     # 使用pipeline处理文档(切分)和向量存储
     index = pipeline_cache(vector_store, documents, chunk_size, chunk_overlap)
         
-    # 获取 retriever top_n结果
-    top_n = 3
-    vector_retriever = get_retriever(index, top_n)
-    # 检索
-    query = "Llama2有多少参数"
-    results = retrieve(vector_retriever, query)
-    print(f"\n检索到 {len(results)} 个结果")
+    # # 获取 retriever top_n结果
+    # top_n = 3
+    # vector_retriever = get_retriever(index, top_n)
+    # # 检索
+    # query = "Llama2有多少参数"
+    # results = retrieve(vector_retriever, query)
+    # print(f"\n检索到 {len(results)} 个结果")
 
-    # 检索后排序    
-    postprocessor = rerank(top_n)
-    # 创建查询包
-    from llama_index.core import QueryBundle
-    query_bundle = QueryBundle(query)   
-    # 将查询和每个文档计算相似性
-    reranked_nodes = postprocessor.postprocess_nodes(results, query_bundle=query_bundle)
+    # # 检索后排序    
+    # postprocessor = rerank(top_n)
+    # # 创建查询包
+    # from llama_index.core import QueryBundle
+    # query_bundle = QueryBundle(query)   
+    # # 将查询和每个文档计算相似性
+    # reranked_nodes = postprocessor.postprocess_nodes(results, query_bundle=query_bundle)
     
-    # 打印重排序后的结果
-    for i, node in enumerate(reranked_nodes):
-        print(f"检索结果 {i}:\n", node, "\n")
+    # # 打印重排序后的结果
+    # for i, node in enumerate(reranked_nodes):
+    #     print(f"检索结果 {i}:\n", node, "\n")
+
+    # 单轮对话
+    # one_chat(index, "Llama2 有多少参数?")
+
+    # 多轮对话
+    multi_chat(index)
 
 if __name__ == "__main__":
     main()
