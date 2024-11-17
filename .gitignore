@@ -5,3 +5,4 @@ data
 chroma_db
 test
 pipeline_storage
+db
