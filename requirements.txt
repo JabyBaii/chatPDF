@@ -10,3 +10,11 @@ jieba==0.42.1
 streamlit==1.39.0
 PyPDF2==3.0.1
 PyMuPDF==1.24.11
+
+langchain==0.3.7
+langchain_community==0.3.7
+langchain_openai==0.2.8
+langchain_text_splitters==0.3.2
+embedchain==0.1.125
+qianfan==0.4.12
+faiss-cpu==1.9.0
