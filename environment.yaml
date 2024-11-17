@@ -7,9 +7,19 @@ dependencies:
   - pip=24.1
   - pip:
     - llama-index==0.11.23
-    - PyMuPDF==1.24.13
     - llama-index-readers-feishu-docs
     - llama-index-vector-stores-qdrant==0.3.3
     - python-dotenv
     - llama-index-embeddings-huggingface
     - sentence-transformers==3.3.0
+    - langchain==0.3.7
+    - langchain_community==0.3.7
+    - langchain_openai==0.2.8
+    - langchain_text_splitters==0.3.2
+    - embedchain==0.1.125
+    - qianfan==0.4.12
+    - faiss-cpu==1.9.0
+    - streamlit==1.39.0
+    - PyPDF2==3.0.1
+    - PyMuPDF==1.24.13
+    - pdfminer.six==20240706
